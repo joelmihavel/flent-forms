@@ -5,7 +5,7 @@ import { createFormStore } from '../form-engine/store/createFormStore';
 import FormRenderer from '../form-engine/core/FormRenderer';
 import WelcomeScreen from '../components/form/WelcomeScreen';
 import ConfigurableSuccessScreen from '../components/form/ConfigurableSuccessScreen';
-import { submitForm, dispatchWebhooks, getHiddenFields } from '../lib/api';
+import { submitForm, dispatchWebhooks, getHiddenFields, sendStepAnswer } from '../lib/api';
 
 interface GenericFormPageProps {
   formId: string;
@@ -39,6 +39,43 @@ export function GenericFormPage({
 
   const store = useStore();
 
+  const handleStepComplete = (step: FormStep, stepIndex: number, data: Record<string, unknown>, isLastStep: boolean) => {
+    const answer: Record<string, unknown> = {};
+    const fieldName = step.meta?.fieldName as string | undefined;
+
+    if (fieldName) {
+      answer[fieldName] = data[fieldName];
+    }
+    if (step.fields) {
+      for (const f of step.fields) {
+        const val = data[f.name];
+        if (val !== undefined) answer[f.name] = val;
+      }
+    }
+    if (step.type === 'file-upload' && fieldName) {
+      answer[fieldName] = data[fieldName];
+    }
+    if (step.type === 'matrix' && fieldName) {
+      answer[fieldName] = data[fieldName];
+    }
+    if (step.type === 'checkbox' && fieldName) {
+      answer[fieldName] = data[fieldName];
+    }
+
+    sendStepAnswer({
+      formId,
+      sessionId: store.sessionId,
+      stepId: step.id,
+      stepIndex,
+      stepType: step.type,
+      stepTitle: step.title,
+      answer,
+      allData: data,
+      isLastStep,
+      timestamp: new Date().toISOString(),
+    });
+  };
+
   const handleSubmit = async (data: Record<string, unknown>) => {
     await submitForm({ formId, ...data });
     if (meta?.webhooks) {
@@ -71,6 +108,7 @@ export function GenericFormPage({
       welcomeComponent={WelcomeScreen}
       successComponent={SuccessComponent}
       canProceedOverride={canProceedOverride}
+      onStepComplete={handleStepComplete}
       logoSrc="/forms/flent-wordmark.svg"
     />
   );

@@ -54,6 +54,34 @@ export function getHiddenFields(config?: { name: string; source: string; value?:
   return result;
 }
 
+export interface StepAnswerPayload {
+  formId: string;
+  sessionId: string;
+  stepId: string;
+  stepIndex: number;
+  stepType: string;
+  stepTitle: string;
+  answer: Record<string, unknown>;
+  allData: Record<string, unknown>;
+  isLastStep: boolean;
+  timestamp: string;
+}
+
+const WEBHOOK_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_WEBHOOK_URL) || '';
+
+export async function sendStepAnswer(payload: StepAnswerPayload): Promise<void> {
+  if (!WEBHOOK_URL) return;
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    // non-blocking
+  }
+}
+
 export async function dispatchWebhooks(
   webhooks: { url: string; method?: string; headers?: Record<string, string>; mapFields?: Record<string, string> }[],
   data: Record<string, unknown>,

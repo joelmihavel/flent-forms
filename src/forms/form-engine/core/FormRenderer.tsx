@@ -38,6 +38,7 @@ interface FormRendererProps {
   successComponent?: React.ComponentType;
   backgroundComponent?: React.ComponentType;
   canProceedOverride?: (step: FormStep, data: Record<string, unknown>, getCurrentItem: () => Record<string, unknown> | null) => boolean;
+  onStepComplete?: (step: FormStep, stepIndex: number, data: Record<string, unknown>, isLastStep: boolean) => void;
   logoSrc?: string;
 }
 
@@ -52,6 +53,7 @@ export default function FormRenderer({
   successComponent: SuccessComponent,
   backgroundComponent: BackgroundComponent,
   canProceedOverride,
+  onStepComplete,
   logoSrc = '/flent-wordmark.svg',
 }: FormRendererProps) {
   const engine = useFormEngine({ schema, store });
@@ -117,8 +119,15 @@ export default function FormRenderer({
     }
   };
 
+  const fireStepComplete = useCallback((isLast: boolean) => {
+    if (onStepComplete) {
+      onStepComplete(step, currentStepIndex, data, isLast);
+    }
+  }, [onStepComplete, step, currentStepIndex, data]);
+
   const handleNext = useCallback(() => {
     if (step.type === 'welcome' || step.type === 'info-screen') {
+      fireStepComplete(false);
       store.nextStep();
       return;
     }
@@ -126,6 +135,7 @@ export default function FormRenderer({
       const selectField = (step.meta?.fieldName as string) || (step.type === 'yes-no' ? step.fields?.[0]?.name || step.id : 'role');
       const selectValue = (data as Record<string, unknown>)[selectField];
       if (!selectValue) return;
+      fireStepComplete(false);
       if (step.nextOverride && step.nextOverride[selectValue as string]) {
         const targetId = step.nextOverride[selectValue as string];
         const targetIdx = schema.findIndex(s => s.id === targetId);
@@ -140,17 +150,20 @@ export default function FormRenderer({
         store.setErrors({ consent: 'Please confirm your details' });
         return;
       }
+      fireStepComplete(true);
       handleSubmitForm();
       return;
     }
     if (!validateCurrentStep()) return;
-    if (effectiveCurrent >= effectiveSteps) {
+    const isLast = effectiveCurrent >= effectiveSteps;
+    fireStepComplete(isLast);
+    if (isLast) {
       handleSubmitForm();
       return;
     }
     store.nextStep();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, currentStepIndex, repeatableIndex, data, errors, effectiveCurrent, effectiveSteps]);
+  }, [step, currentStepIndex, repeatableIndex, data, errors, effectiveCurrent, effectiveSteps, fireStepComplete]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
