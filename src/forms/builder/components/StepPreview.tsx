@@ -1,19 +1,6 @@
 import {
   IconCalendar,
-  IconCheckbox,
-  IconClick,
   IconFileUpload,
-  IconHandClick,
-  IconHash,
-  IconInfoCircle,
-  IconList,
-  IconListCheck,
-  IconMoodSmile,
-  IconNotes,
-  IconPhone,
-  IconRocket,
-  IconStar,
-  IconTextCaption,
 } from '@tabler/icons-react';
 import type { FormStep } from '../../schema/types';
 import { useBuilderStore } from '../store/builderStore';
@@ -74,7 +61,7 @@ export function StepPreview() {
           ) : step.type === 'info-screen' ? (
             <InfoPreview step={step} />
           ) : (
-            <QuestionPreview step={step} index={selectedStepIndex} totalVisible={steps.length} />
+            <QuestionPreview step={step} index={selectedStepIndex} />
           )}
         </div>
       </div>
@@ -149,7 +136,7 @@ function InfoPreview({ step }: { step: FormStep }) {
   );
 }
 
-function QuestionPreview({ step, index, totalVisible }: { step: FormStep; index: number; totalVisible: number }) {
+function QuestionPreview({ step, index }: { step: FormStep; index: number }) {
   return (
     <>
       <div style={{
@@ -396,7 +383,7 @@ function MatrixPreview({ step }: { step: FormStep }) {
           </tr>
         </thead>
         <tbody>
-          {matrix.rows.map((row, ri) => (
+          {matrix.rows.map((row) => (
             <tr key={row.id} style={{ borderTop: '1px solid #eee' }}>
               <td style={{ padding: '10px 12px', color: '#333' }}>{row.label}</td>
               {matrix.columns.map((_, ci) => (

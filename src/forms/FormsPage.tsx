@@ -12,7 +12,7 @@ import {
 
 import { FORM_REGISTRY, type FormCategory, type FormEntry } from './formRegistry';
 import { FormPreviewModal } from './FormPreviewModal';
-import { getCustomForms, deleteCustomForm, type CustomFormData } from './builder/store/builderStore';
+import { getCustomForms, deleteCustomForm } from './builder/store/builderStore';
 
 type SectionKey = FormCategory | 'Custom';
 const SECTION_ORDER: SectionKey[] = ['Supply', 'Demand', 'Custom'];

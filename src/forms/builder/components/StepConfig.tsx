@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconPlus, IconTrash, IconGripVertical } from '@tabler/icons-react';
-import type { FormStep, FieldDefinition, SelectOption, MatrixRow, ConditionalRule } from '../../schema/types';
+import type { FormStep, FieldDefinition, SelectOption, ConditionalRule } from '../../schema/types';
 import { useBuilderStore } from '../store/builderStore';
 
 export function StepConfig() {

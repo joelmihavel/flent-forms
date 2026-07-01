@@ -22,7 +22,6 @@ import {
   IconChevronUp,
   IconChevronDown,
 } from '@tabler/icons-react';
-import type { FormStep } from '../../schema/types';
 import { useBuilderStore } from '../store/builderStore';
 
 const STEP_ICONS: Record<string, typeof IconClick> = {

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { FormStep, StepType, FieldDefinition, SelectOption } from '../../schema/types';
+import type { FormStep, StepType } from '../../schema/types';
 
 export interface CustomFormData {
   id: string;
