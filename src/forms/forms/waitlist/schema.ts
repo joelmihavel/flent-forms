@@ -1,0 +1,241 @@
+import type { FormStep } from '../../schema/types';
+
+export const schema: FormStep[] = [
+  {
+    id: 'welcome',
+    type: 'welcome',
+    title: 'Good things come to those who sign up.',
+    subtitle:
+      "Thoughtfully furnished homes in Bangalore's best neighbourhoods. Get on the list.",
+    meta: {
+      overline: 'Join the Waitlist',
+      ctaLabel: 'Sign Me Up',
+      estimatedTime: '~5 min',
+      audience: 'prospect',
+      successTitle: "You're on the list.",
+      successSubtitle:
+        "We'll reach out when we have a home that matches what you're looking for.",
+      hiddenFields: [{ name: 'utm_source', source: 'url' }],
+    },
+  },
+  {
+    id: 'contact-details',
+    type: 'field-group',
+    title: "Let's start with the basics",
+    fields: [
+      {
+        name: 'firstName',
+        type: 'text',
+        label: 'First Name',
+        placeholder: 'Enter your first name',
+        required: true,
+        validation: [{ type: 'required', message: 'First name is required' }],
+      },
+      {
+        name: 'lastName',
+        type: 'text',
+        label: 'Last Name',
+        placeholder: 'Enter your last name',
+        required: true,
+        validation: [{ type: 'required', message: 'Last name is required' }],
+      },
+      {
+        name: 'phone',
+        type: 'tel',
+        label: 'Phone',
+        placeholder: 'Enter your phone number',
+        required: true,
+        validation: [
+          { type: 'phone', message: 'Enter a valid phone number' },
+        ],
+      },
+      {
+        name: 'email',
+        type: 'email',
+        label: 'Email',
+        placeholder: 'Enter your email address',
+        required: true,
+        validation: [
+          { type: 'email', message: 'Enter a valid email address' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'linkedin',
+    type: 'text-input',
+    title: 'Alright, can you paste your LinkedIn profile URL here?',
+    meta: { fieldName: 'linkedin' },
+    fields: [
+      {
+        name: 'linkedin',
+        type: 'text',
+        label: 'LinkedIn URL',
+        placeholder: 'https://linkedin.com/in/your-profile',
+      },
+    ],
+  },
+  {
+    id: 'workplace',
+    type: 'text-input',
+    title: 'Where do you work, {{field:firstName}}?',
+    meta: { fieldName: 'workplace' },
+    fields: [
+      {
+        name: 'workplace',
+        type: 'text',
+        label: 'Workplace',
+        placeholder: 'Enter your company name',
+      },
+    ],
+  },
+  {
+    id: 'referral-source',
+    type: 'single-select',
+    title: 'How did you first hear about Flent?',
+    options: [
+      { label: 'Instagram', value: 'instagram' },
+      { label: 'LinkedIn', value: 'linkedin' },
+      { label: 'Friend/Colleague', value: 'friend_colleague' },
+      { label: 'Google', value: 'google' },
+      { label: 'Event', value: 'event' },
+      { label: 'Twitter/X', value: 'twitter' },
+      { label: 'Other', value: 'other' },
+    ],
+    meta: { fieldName: 'referralSource' },
+  },
+  {
+    id: 'gender',
+    type: 'single-select',
+    title: 'How do you identify yourself?',
+    options: [
+      { label: 'Male', value: 'male' },
+      { label: 'Female', value: 'female' },
+      { label: 'Non-binary', value: 'non_binary' },
+      { label: 'Prefer not to say', value: 'prefer_not_to_say' },
+    ],
+    meta: { fieldName: 'gender' },
+  },
+  {
+    id: 'preferred-locations',
+    type: 'multi-select',
+    title: 'Where do you want your next home to be?',
+    options: [
+      { label: 'Koramangala', value: 'koramangala' },
+      { label: 'Indiranagar', value: 'indiranagar' },
+      { label: 'HSR Layout', value: 'hsr_layout' },
+      { label: 'Whitefield', value: 'whitefield' },
+      { label: 'JP Nagar', value: 'jp_nagar' },
+      { label: 'Jayanagar', value: 'jayanagar' },
+      { label: 'Hebbal', value: 'hebbal' },
+      { label: 'Sarjapur Road', value: 'sarjapur_road' },
+      { label: 'Electronic City', value: 'electronic_city' },
+      { label: 'Other', value: 'other' },
+    ],
+    meta: { fieldName: 'preferredLocations' },
+  },
+  {
+    id: 'budget',
+    type: 'single-select',
+    title: 'How much can you shell out on rent for one room per month?',
+    options: [
+      { label: 'Under ₹15,000', value: 'under_15k' },
+      { label: '₹15,000–₹25,000', value: '15k_25k' },
+      { label: '₹25,000–₹40,000', value: '25k_40k' },
+      { label: '₹40,000+', value: '40k_plus' },
+    ],
+    meta: { fieldName: 'budget' },
+  },
+  {
+    id: 'move-in-timeline',
+    type: 'single-select',
+    title: 'When are you planning to move in?',
+    options: [
+      { label: 'This month', value: 'this_month' },
+      { label: 'Next month', value: 'next_month' },
+      { label: 'In 2-3 months', value: '2_3_months' },
+      { label: 'Just exploring', value: 'just_exploring' },
+    ],
+    meta: { fieldName: 'moveInTimeline' },
+  },
+  {
+    id: 'compatibility-intro',
+    type: 'info-screen',
+    title:
+      'Now, onto the next set of questions. These are related to flatmate compatibility :)',
+    meta: { icon: '🏠' },
+  },
+  {
+    id: 'nonveg-cooking',
+    type: 'single-select',
+    title: 'Are you okay with non-veg being cooked in the house?',
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+      { label: "Doesn't matter", value: 'doesnt_matter' },
+    ],
+    meta: { fieldName: 'nonvegCooking' },
+  },
+  {
+    id: 'nonveg-ordering',
+    type: 'single-select',
+    title: 'Are you okay with non-veg being ordered in the house?',
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+      { label: "Doesn't matter", value: 'doesnt_matter' },
+    ],
+    meta: { fieldName: 'nonvegOrdering' },
+  },
+  {
+    id: 'smoking',
+    type: 'single-select',
+    title: 'Are you okay with having flatmates who smoke?',
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+      { label: "Doesn't matter", value: 'doesnt_matter' },
+    ],
+    meta: { fieldName: 'smokingTolerance' },
+  },
+  {
+    id: 'pets',
+    type: 'single-select',
+    title: "Are you okay with having anyone's pet in the house?",
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+      { label: "Doesn't matter", value: 'doesnt_matter' },
+    ],
+    meta: { fieldName: 'petTolerance' },
+  },
+  {
+    id: 'parking',
+    type: 'single-select',
+    title: 'Do you need parking space for a 2-wheeler or 4-wheeler?',
+    options: [
+      { label: '2-wheeler', value: '2_wheeler' },
+      { label: '4-wheeler', value: '4_wheeler' },
+      { label: 'Both', value: 'both' },
+      { label: 'No parking needed', value: 'none' },
+    ],
+    meta: { fieldName: 'parkingNeed' },
+  },
+  {
+    id: 'opposite-gender',
+    type: 'single-select',
+    title: 'Are you cool with flatmates of the opposite gender?',
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+      { label: "Doesn't matter", value: 'doesnt_matter' },
+    ],
+    meta: { fieldName: 'oppositeGenderTolerance' },
+  },
+  {
+    id: 'additional-info',
+    type: 'long-text',
+    title: "Any additional information you'd like to provide",
+    meta: { fieldName: 'additionalInfo' },
+  },
+];

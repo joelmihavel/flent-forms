@@ -1,0 +1,293 @@
+import type { FormStep } from '../../schema/types';
+
+export const schema: FormStep[] = [
+  {
+    id: 'welcome',
+    type: 'welcome',
+    title: 'Supply Property Details',
+    subtitle: 'Capture property information for the ops pipeline.',
+    meta: {
+      overline: 'Internal Ops',
+      ctaLabel: 'Start',
+      estimatedTime: '~5 min',
+      audience: 'internal',
+      successTitle: 'Property details captured.',
+      successSubtitle: 'The ops team will take it from here.',
+    },
+  },
+  {
+    id: 'filled-by',
+    type: 'dropdown',
+    title: 'Who is filling the form?',
+    options: [
+      { label: 'Supply Manager', value: 'supply_manager' },
+      { label: 'Property Coordinator', value: 'property_coordinator' },
+      { label: 'Operations Lead', value: 'operations_lead' },
+      { label: 'Field Executive', value: 'field_executive' },
+    ],
+    meta: { fieldName: 'filledBy' },
+  },
+  {
+    id: 'pid',
+    type: 'text-input',
+    title: 'What is the PID?',
+    fields: [
+      {
+        name: 'pid',
+        type: 'text',
+        label: 'PID',
+        placeholder: 'Enter Property ID',
+        required: true,
+        validation: [{ type: 'required', message: 'PID is required' }],
+      },
+    ],
+  },
+  {
+    id: 'email-ids',
+    type: 'field-group',
+    title: 'Email IDs',
+    fields: [
+      {
+        name: 'pocEmail',
+        type: 'email',
+        label: "POC's Email",
+        placeholder: 'poc@example.com',
+      },
+      {
+        name: 'landlordEmail',
+        type: 'email',
+        label: "Landlord's Email",
+        placeholder: 'landlord@example.com',
+      },
+      {
+        name: 'secondLandlordEmail',
+        type: 'email',
+        label: "2nd Landlord's Email",
+        placeholder: 'Optional',
+      },
+      {
+        name: 'thirdLandlordEmail',
+        type: 'email',
+        label: "3rd Landlord's Email",
+        placeholder: 'Optional',
+      },
+    ],
+  },
+  {
+    id: 'location',
+    type: 'field-group',
+    title: 'Location',
+    fields: [
+      {
+        name: 'apartmentNumber',
+        type: 'text',
+        label: 'Apartment number',
+        placeholder: 'e.g. A-302',
+      },
+      {
+        name: 'floorNumber',
+        type: 'text',
+        label: 'Floor number',
+        placeholder: 'e.g. 3',
+      },
+      {
+        name: 'googleMapsLink',
+        type: 'text',
+        label: 'Google Maps link',
+        placeholder: 'https://maps.google.com/...',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Google Maps link is required' },
+        ],
+      },
+      {
+        name: 'localityClusterCode',
+        type: 'select',
+        label: 'Locality cluster code',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Locality cluster is required' },
+        ],
+        options: [
+          { label: 'Koramangala', value: 'koramangala' },
+          { label: 'Indiranagar', value: 'indiranagar' },
+          { label: 'HSR Layout', value: 'hsr_layout' },
+          { label: 'BTM Layout', value: 'btm_layout' },
+          { label: 'Whitefield', value: 'whitefield' },
+          { label: 'Marathahalli', value: 'marathahalli' },
+          { label: 'Electronic City', value: 'electronic_city' },
+          { label: 'Jayanagar', value: 'jayanagar' },
+          { label: 'JP Nagar', value: 'jp_nagar' },
+          { label: 'Bannerghatta Road', value: 'bannerghatta_road' },
+          { label: 'Sarjapur Road', value: 'sarjapur_road' },
+          { label: 'Hebbal', value: 'hebbal' },
+          { label: 'Yelahanka', value: 'yelahanka' },
+          { label: 'Rajajinagar', value: 'rajajinagar' },
+          { label: 'Malleshwaram', value: 'malleshwaram' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'property-details',
+    type: 'field-group',
+    title: 'Property',
+    fields: [
+      {
+        name: 'propertyType',
+        type: 'select',
+        label: 'Property type',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Property type is required' },
+        ],
+        options: [
+          { label: '1 BHK', value: '1bhk' },
+          { label: '2 BHK', value: '2bhk' },
+          { label: '3 BHK', value: '3bhk' },
+          { label: '4 BHK', value: '4bhk' },
+          { label: 'Studio', value: 'studio' },
+          { label: 'Villa', value: 'villa' },
+          { label: 'Duplex', value: 'duplex' },
+        ],
+      },
+      {
+        name: 'managementApp',
+        type: 'select',
+        label: 'Property management app?',
+        options: [
+          { label: 'MyGate', value: 'mygate' },
+          { label: 'NoBroker Hood', value: 'nobroker_hood' },
+          { label: 'ApnaComplex', value: 'apnacomplex' },
+          { label: 'JEEVES', value: 'jeeves' },
+          { label: 'Other', value: 'other' },
+          { label: 'None', value: 'none' },
+        ],
+      },
+      {
+        name: 'numberOfUnits',
+        type: 'number',
+        label: 'How many units?',
+        placeholder: 'e.g. 1',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Number of units is required' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dates',
+    type: 'field-group',
+    title: 'Dates',
+    fields: [
+      {
+        name: 'keyHandoverDate',
+        type: 'text',
+        label: 'Key handover date',
+        placeholder: 'DD/MM/YYYY',
+      },
+      {
+        name: 'rentStartDate',
+        type: 'text',
+        label: 'Rent start date',
+        placeholder: 'DD/MM/YYYY',
+      },
+      {
+        name: 'agreementRenewalDate',
+        type: 'text',
+        label: 'Agreement renewal date',
+        placeholder: 'DD/MM/YYYY',
+      },
+    ],
+  },
+  {
+    id: 'commercials',
+    type: 'field-group',
+    title: 'Commercials',
+    fields: [
+      {
+        name: 'baseRent',
+        type: 'number',
+        label: 'Base rent',
+        prefix: '₹',
+        placeholder: 'e.g. 25000',
+        required: true,
+        validation: [{ type: 'required', message: 'Base rent is required' }],
+      },
+      {
+        name: 'monthlyMaintenance',
+        type: 'number',
+        label: 'Monthly maintenance',
+        prefix: '₹',
+        placeholder: 'e.g. 5000',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Monthly maintenance is required' },
+        ],
+      },
+      {
+        name: 'maintenanceToLandlord',
+        type: 'select',
+        label: 'Maintenance to LL?',
+        required: true,
+        validation: [{ type: 'required', message: 'This field is required' }],
+        options: [
+          { label: 'Yes', value: 'yes' },
+          { label: 'No', value: 'no' },
+        ],
+      },
+      {
+        name: 'securityDeposit',
+        type: 'number',
+        label: 'Security deposit',
+        prefix: '₹',
+        placeholder: 'e.g. 100000',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Security deposit is required' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'last-questions',
+    type: 'field-group',
+    title: 'Last questions',
+    fields: [
+      {
+        name: 'incrementPercent',
+        type: 'number',
+        label: 'Increment %',
+        placeholder: 'e.g. 5',
+        required: true,
+        validation: [
+          { type: 'required', message: 'Increment % is required' },
+        ],
+      },
+      {
+        name: 'pmFeesPercent',
+        type: 'number',
+        label: 'PM fees %',
+        placeholder: 'e.g. 8',
+      },
+      {
+        name: 'acquisitionCost',
+        type: 'number',
+        label: 'Acquisition cost',
+        prefix: '₹',
+        placeholder: 'e.g. 50000',
+      },
+      {
+        name: 'furnishingStatus',
+        type: 'select',
+        label: 'Furnishing status',
+        options: [
+          { label: 'Fully Furnished', value: 'fully_furnished' },
+          { label: 'Semi Furnished', value: 'semi_furnished' },
+          { label: 'Unfurnished', value: 'unfurnished' },
+        ],
+      },
+    ],
+  },
+];
