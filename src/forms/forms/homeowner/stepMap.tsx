@@ -6,9 +6,8 @@ import PANInput from '../../components/form/PANInput';
 import BankFields from '../../components/form/BankFields';
 import FileUpload from '../../components/form/FileUpload';
 import ReviewScreen from '../../components/form/ReviewScreen';
-import type { UploadedFile } from '../../types/form';
 
-function PANStep({ step, errors, getCurrentItem, setField, getFieldPath, onNext }: CustomStepProps) {
+function PANStep({ errors, getCurrentItem, setField, getFieldPath, onNext }: CustomStepProps) {
   const ho = getCurrentItem() as HomeownerData | null;
   return (
     <PANInput

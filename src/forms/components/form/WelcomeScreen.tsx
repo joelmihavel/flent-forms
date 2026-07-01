@@ -9,13 +9,6 @@ interface Props {
   onNext: () => void;
 }
 
-const DEFAULT_DOCS = [
-  { label: 'Aadhaar Card', icon: '🪪', color: COLORS.pastelCyan },
-  { label: 'PAN Card', icon: '💳', color: COLORS.pastelOrange },
-  { label: 'Bank Details', icon: '🏦', color: COLORS.pastelViolet },
-  { label: 'Property Docs', icon: '📄', color: COLORS.pastelYellow },
-];
-
 const DOC_COLORS = [COLORS.pastelCyan, COLORS.pastelOrange, COLORS.pastelViolet, COLORS.pastelYellow, COLORS.pastelPink, COLORS.pastelGreen];
 const DOC_ICONS = ['📄', '📋', '🏦', '⚡', '🔧', '📦'];
 
