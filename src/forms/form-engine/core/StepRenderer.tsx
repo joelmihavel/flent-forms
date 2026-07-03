@@ -252,7 +252,7 @@ export default function StepRenderer({
 
     case 'file-upload': {
       const fileConfig = step.fileUpload || { accept: ['.jpg', '.jpeg', '.png', '.pdf'], maxSizeMB: 5, label: 'Upload file' };
-      const fileValue = (data as Record<string, unknown>)[fieldName] as { id: string; url: string } | null;
+      const fileValue = (data as Record<string, unknown>)[fieldName] as import('../../types/form').UploadedFile | null;
       return (
         <FileUpload
           config={fileConfig}
