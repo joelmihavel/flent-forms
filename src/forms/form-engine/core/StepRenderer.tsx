@@ -16,6 +16,7 @@ import MatrixInput from '../../components/form/MatrixInput';
 import CheckboxAcknowledge from '../../components/form/CheckboxAcknowledge';
 import LongTextInput from '../../components/form/LongTextInput';
 import PhoneInput from '../../components/form/PhoneInput';
+import FileUpload from '../../components/form/FileUpload';
 
 interface StepRendererProps {
   step: FormStep;
@@ -248,6 +249,18 @@ export default function StepRenderer({
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onNext(); } }}
         />
       );
+
+    case 'file-upload': {
+      const fileConfig = step.fileUpload || { accept: ['.jpg', '.jpeg', '.png', '.pdf'], maxSizeMB: 5, label: 'Upload file' };
+      const fileValue = (data as Record<string, unknown>)[fieldName] as { id: string; url: string } | null;
+      return (
+        <FileUpload
+          config={fileConfig}
+          value={fileValue}
+          onChange={(file) => setField(fieldName, file)}
+        />
+      );
+    }
 
     case 'info-screen':
     case 'review':

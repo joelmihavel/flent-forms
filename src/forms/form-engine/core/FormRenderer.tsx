@@ -239,6 +239,11 @@ export default function FormRenderer({
       const items = step.checkboxItems || [];
       return Array.isArray(val) && val.length === items.length;
     }
+    if (step.type === 'file-upload') {
+      const hasRequired = step.validation?.some(v => v.type === 'required');
+      if (hasRequired) return val !== undefined && val !== null;
+      return true;
+    }
     if (step.type === 'long-text' || step.type === 'phone') {
       return !!val && String(val).trim().length > 0;
     }
