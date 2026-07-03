@@ -24,10 +24,17 @@ const TENANT_FIELD_MAP: Record<string, string> = {
   firstName: 'name.firstName',
   lastName: 'name.lastName',
   email: 'email.primaryEmail',
-  phone: 'phone.primaryPhoneNumber',
-  company: 'company',
-  linkedin: 'linkedIn',
-  roomId: 'ridRef',
+  phone: 'mobilePhone.primaryPhoneNumber',
+  company: 'employerName',
+  linkedin: 'linkedinUrl.primaryLinkUrl',
+  twitterHandle: 'twitterUrl.primaryLinkUrl',
+  roomId: 'currentRid',
+  role: 'occupation',
+  panNumber: 'pan',
+  aadhaarNumber: 'aadhaarNumber',
+  dateOfBirth: 'dateOfBirth',
+  permanentAddress: 'legalAddress',
+  discoverySource: 'firstInquiryChannel',
 };
 
 const MERCHANT_FIELD_MAP: Record<string, string> = {
@@ -51,6 +58,16 @@ const FIELD_MAPS: Record<string, Record<string, string>> = {
   propertyPids: PROPERTY_FIELD_MAP,
 };
 
+// Fields the form collects that don't map to CRM fields — strip before sending
+const IGNORED_FIELDS = new Set([
+  'hasReferral', 'referralFriendName', 'referralFriendContact', 'voucherCode',
+  'nonVegOk', 'smokingFlatmatesOk', 'parking', 'movingFrom',
+  'consentWebsite', 'consentBgCheck', 'agreementStartDate',
+  'hubspot_utk', 'hubspot_page_name', 'hubspot_page_url',
+  'aadhaarFront', 'aadhaarBack', 'panCard', 'uanNumber', 'fatherName',
+  'age', 'lockInPeriod', 'foodPrefs', 'smokingStatus',
+]);
+
 function headers(): Record<string, string> {
   const h: Record<string, string> = { 'Content-Type': 'application/json' };
   if (API_KEY) h['Authorization'] = `Bearer ${API_KEY}`;
@@ -66,16 +83,28 @@ function mapFormDataToCrm(
 
   const mapped: Record<string, unknown> = {};
   for (const [formKey, value] of Object.entries(formData)) {
+    if (IGNORED_FIELDS.has(formKey)) continue;
+    if (value === undefined || value === null || value === '') continue;
+
     const crmPath = fieldMap[formKey];
     if (crmPath && crmPath.includes('.')) {
       const [parent, child] = crmPath.split('.');
       mapped[parent] = { ...(mapped[parent] as Record<string, unknown> || {}), [child]: value };
     } else if (crmPath) {
       mapped[crmPath] = value;
-    } else {
-      mapped[formKey] = value;
     }
+    // Skip unmapped fields — don't send unknown keys to the API
   }
+
+  // Add phone country code defaults for composite phone fields
+  if (mapped['mobilePhone']) {
+    mapped['mobilePhone'] = {
+      primaryPhoneCountryCode: 'IN',
+      primaryPhoneCallingCode: '+91',
+      ...(mapped['mobilePhone'] as Record<string, unknown>),
+    };
+  }
+
   return mapped;
 }
 
