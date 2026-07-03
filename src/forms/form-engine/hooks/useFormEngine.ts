@@ -71,14 +71,17 @@ export function useFormEngine({ schema, store }: UseFormEngineOptions) {
   }, [step, repeatableIndex, data]);
 
   const getValues = useCallback((): Record<string, string> => {
+    const vals: Record<string, string> = {};
     if (step.fields) {
-      const vals: Record<string, string> = {};
       for (const field of step.fields) {
         vals[field.name] = getFieldValue(field.name);
       }
-      return vals;
     }
-    return {};
+    const metaField = step.meta?.fieldName as string | undefined;
+    if (metaField && !(metaField in vals)) {
+      vals[metaField] = getFieldValue(metaField);
+    }
+    return vals;
   }, [step, getFieldValue]);
 
   const validateCurrentStep = useCallback((): boolean => {
