@@ -13,8 +13,8 @@ interface Props {
 export default function ConfigurableSuccessScreen({
   title = "You're all set!",
   subtitle = "Welcome aboard. We'll take it from here.",
-  ctaLabel = 'Done',
-  ctaUrl = '/',
+  ctaLabel,
+  ctaUrl,
 }: Props) {
   const fireConfetti = useCallback(() => {}, []);
 
@@ -125,19 +125,21 @@ export default function ConfigurableSuccessScreen({
             {subtitle}
           </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.4 }}
-          >
-            <Button
-              variant="cta"
-              label={ctaLabel}
-              size="lg"
-              fullWidth
-              onClick={() => { window.location.href = ctaUrl; }}
-            />
-          </motion.div>
+          {ctaUrl && ctaLabel && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.4 }}
+            >
+              <Button
+                variant="cta"
+                label={ctaLabel}
+                size="lg"
+                fullWidth
+                onClick={() => { window.location.href = ctaUrl; }}
+              />
+            </motion.div>
+          )}
         </div>
       </div>
     </div>
