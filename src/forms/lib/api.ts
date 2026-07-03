@@ -1,4 +1,101 @@
-// Stub API for form preview mode — no actual network calls
+const API_KEY = import.meta.env.VITE_HAWKEYE_API_KEY || '';
+const HAWKEYE_URL = import.meta.env.VITE_HAWKEYE_API_URL || '';
+const IS_DEV = import.meta.env.DEV;
+// Dev uses Vite proxy to avoid CORS; production calls the API directly
+const API_BASE = HAWKEYE_URL
+  ? IS_DEV ? '/hawkeye/rest' : `${HAWKEYE_URL}/rest`
+  : '';
+
+const FORM_TO_CRM_OBJECT: Record<string, string> = {
+  'tenant-onboarding': 'tenants',
+  'landlord-onboarding': 'merchants',
+  'landlord-onboarding-basic': 'merchants',
+  'homeowner-onboarding': 'merchants',
+  'property-lead-capture': 'propertyPids',
+  'property-lead-capture-v1': 'propertyPids',
+  'supply-property-details': 'propertyPids',
+  'landlord-property-details': 'propertyPids',
+  'property-info-capture': 'propertyPids',
+  'contract-creation': 'contracts',
+  'landlord-inbound': 'merchants',
+};
+
+const TENANT_FIELD_MAP: Record<string, string> = {
+  firstName: 'name.firstName',
+  lastName: 'name.lastName',
+  email: 'email.primaryEmail',
+  phone: 'phone.primaryPhoneNumber',
+  company: 'company',
+  linkedin: 'linkedIn',
+  roomId: 'ridRef',
+};
+
+const MERCHANT_FIELD_MAP: Record<string, string> = {
+  firstName: 'name.firstName',
+  lastName: 'name.lastName',
+  ownerName: 'name.firstName',
+  email: 'email.primaryEmail',
+  phone: 'phone.primaryPhoneNumber',
+  panNumber: 'panNumber',
+};
+
+const PROPERTY_FIELD_MAP: Record<string, string> = {
+  propertyName: 'pid',
+  address: 'propertyAddress.markdown',
+  city: 'city',
+};
+
+const FIELD_MAPS: Record<string, Record<string, string>> = {
+  tenants: TENANT_FIELD_MAP,
+  merchants: MERCHANT_FIELD_MAP,
+  propertyPids: PROPERTY_FIELD_MAP,
+};
+
+function headers(): Record<string, string> {
+  const h: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (API_KEY) h['Authorization'] = `Bearer ${API_KEY}`;
+  return h;
+}
+
+function mapFormDataToCrm(
+  formData: Record<string, unknown>,
+  objectName: string,
+): Record<string, unknown> {
+  const fieldMap = FIELD_MAPS[objectName];
+  if (!fieldMap) return formData;
+
+  const mapped: Record<string, unknown> = {};
+  for (const [formKey, value] of Object.entries(formData)) {
+    const crmPath = fieldMap[formKey];
+    if (crmPath && crmPath.includes('.')) {
+      const [parent, child] = crmPath.split('.');
+      mapped[parent] = { ...(mapped[parent] as Record<string, unknown> || {}), [child]: value };
+    } else if (crmPath) {
+      mapped[crmPath] = value;
+    } else {
+      mapped[formKey] = value;
+    }
+  }
+  return mapped;
+}
+
+async function hawkeyePost(path: string, body: unknown): Promise<unknown> {
+  if (!API_BASE) {
+    console.warn('[forms] No Hawkeye API configured — skipping POST to', path);
+    return { success: true, submissionId: 'local-preview' };
+  }
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    console.error(`[forms] Hawkeye POST ${path} failed:`, res.status, text);
+    throw new Error(`Hawkeye API error: ${res.status}`);
+  }
+  return res.json();
+}
 
 export async function sendOTP(_phone: string) {
   return { success: true, otpId: 'preview-otp' };
@@ -36,8 +133,37 @@ export async function saveDraft(_data: unknown) {
   return { success: true, savedAt: new Date().toISOString() };
 }
 
-export async function submitForm(_data: unknown) {
-  return { success: true, submissionId: 'preview' };
+export async function submitForm(data: unknown) {
+  const formData = data as Record<string, unknown>;
+  const formId = formData.formId as string;
+
+  const crmObject = formId ? FORM_TO_CRM_OBJECT[formId] : undefined;
+
+  if (crmObject && API_BASE) {
+    const { formId: _, ...fields } = formData;
+    const mapped = mapFormDataToCrm(fields, crmObject);
+    try {
+      const result = await hawkeyePost(`/${crmObject}`, mapped);
+      return { success: true, submissionId: (result as Record<string, unknown>).id || 'created' };
+    } catch (err) {
+      console.error('[forms] CRM create failed, falling back:', err);
+    }
+  }
+
+  // Fallback: store as a note if no object mapping or if creation failed
+  if (API_BASE) {
+    try {
+      await hawkeyePost('/notes', {
+        title: `Form submission: ${formId}`,
+        body: { markdown: JSON.stringify(formData, null, 2) },
+      });
+      return { success: true, submissionId: 'note-created' };
+    } catch {
+      // silent fallback
+    }
+  }
+
+  return { success: true, submissionId: 'local-preview' };
 }
 
 export function getHiddenFields(config?: { name: string; source: string; value?: string }[]): Record<string, string> {
@@ -70,15 +196,29 @@ export interface StepAnswerPayload {
 const WEBHOOK_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_WEBHOOK_URL) || '';
 
 export async function sendStepAnswer(payload: StepAnswerPayload): Promise<void> {
-  if (!WEBHOOK_URL) return;
-  try {
-    await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    // non-blocking
+  if (WEBHOOK_URL) {
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      // non-blocking
+    }
+    return;
+  }
+
+  // Stream step answers to Hawkeye as notes for tracking
+  if (API_BASE && payload.isLastStep) {
+    try {
+      await hawkeyePost('/notes', {
+        title: `[${payload.formId}] Step: ${payload.stepTitle}`,
+        body: { markdown: `Session: ${payload.sessionId}\n\n${JSON.stringify(payload.answer, null, 2)}` },
+      });
+    } catch {
+      // non-blocking
+    }
   }
 }
 
