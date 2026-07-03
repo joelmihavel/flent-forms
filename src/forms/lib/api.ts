@@ -34,7 +34,6 @@ const TENANT_FIELD_MAP: Record<string, string> = {
   aadhaarNumber: 'aadhaarNumber',
   dateOfBirth: 'dateOfBirth',
   permanentAddress: 'legalAddress',
-  discoverySource: 'firstInquiryChannel',
 };
 
 const MERCHANT_FIELD_MAP: Record<string, string> = {
@@ -60,6 +59,7 @@ const FIELD_MAPS: Record<string, Record<string, string>> = {
 
 // Fields the form collects that don't map to CRM fields — strip before sending
 const IGNORED_FIELDS = new Set([
+  'discoverySource',
   'hasReferral', 'referralFriendName', 'referralFriendContact', 'voucherCode',
   'nonVegOk', 'smokingFlatmatesOk', 'parking', 'movingFrom',
   'consentWebsite', 'consentBgCheck', 'agreementStartDate',
@@ -184,7 +184,7 @@ export async function submitForm(data: unknown) {
     try {
       await hawkeyePost('/notes', {
         title: `Form submission: ${formId}`,
-        body: { markdown: JSON.stringify(formData, null, 2) },
+        bodyV2: { markdown: JSON.stringify(formData, null, 2) },
       });
       return { success: true, submissionId: 'note-created' };
     } catch {
@@ -243,7 +243,7 @@ export async function sendStepAnswer(payload: StepAnswerPayload): Promise<void> 
     try {
       await hawkeyePost('/notes', {
         title: `[${payload.formId}] Step: ${payload.stepTitle}`,
-        body: { markdown: `Session: ${payload.sessionId}\n\n${JSON.stringify(payload.answer, null, 2)}` },
+        bodyV2: { markdown: `Session: ${payload.sessionId}\n\n${JSON.stringify(payload.answer, null, 2)}` },
       });
     } catch {
       // non-blocking
